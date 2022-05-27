@@ -1,0 +1,1904 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <iomanip>
+#include <cstdlib>
+#include <windows.h>  
+#include <stdlib.h>
+
+using namespace std;
+
+class TPortal {
+    
+    protected:
+        int static const size = 100;
+        string  MTSA_Name[size], MTSB_Name[size], BEEPA_Name[size], BEBME_Name[size], FileHeader;
+        int     MTSA_Roll[size], MTSB_Roll[size], BEEPA_Roll[size], BEBME_Roll[size], sizee[4];
+        float   MTSA_LP[size][14], MTSB_LP[size][14], BEEPA_LP[size][14], BEBME_LP[size][14], MTSA_LR[size][14], MTSB_LR[size][14], BEEPA_LR[size][14], BEBME_LR[size][14], 
+                MTSA_MMarks[size], MTSB_MMarks[size], BEEPA_MMarks[size], BEBME_MMarks[size], MTSA_FMarks[size], MTSB_FMarks[size], BEEPA_FMarks[size], BEBME_FMarks[size], 
+                MTSA_Cea[size], MTSB_Cea[size], BEEPA_Cea[size], BEBME_Cea[size], 
+				BEBME_totalLP[size], BEBME_totalLR[size], BEBME_totalMid[size], BEBME_totalFinal[size], BEBME_totalCea[size],
+                MTSA_totalLP[size], MTSA_totalLR[size], MTSA_totalMid[size], MTSA_totalFinal[size], MTSA_totalCea[size],
+                MTSB_totalLP[size], MTSB_totalLR[size], MTSB_totalMid[size], MTSB_totalFinal[size], MTSB_totalCea[size],
+                BEEPA_totalLP[size], BEEPA_totalLR[size], BEEPA_totalMid[size], BEEPA_totalFinal[size], BEEPA_totalCea[size],
+                BEBME_total[size], MTSA_total[size], MTSB_total[size], BEEPA_total[size];
+        char 	BEBME_grade[size], MTSA_grade[size], MTSB_grade[size], BEEPA_grade[size]; 
+		float weight_LP, weight_LR, weight_Mid, weight_Final, weight_Cea;		
+        
+    public:
+    	
+    	void ReadFileBEBME() {
+    		
+    		ifstream BEBME_OOP;										//Making the file variable and storing the file in it
+    		BEBME_OOP.open("BEBME-OOP-GRADES.csv");
+    		
+    		string line = "";										//line string to store the line of the file
+    		getline(BEBME_OOP, line);								//Storing the first line of the file in the line variable
+    		FileHeader = line;
+    		line = "";												//The first line of this file has headers, this is to ignore that
+    		
+    		int i=0;
+    		while(getline(BEBME_OOP, line)) {						//Reading the whole line of the file and storing it into variable line. Using that as a condition: "If this keeps happening, run the loop".
+    		
+    			
+    			
+    			string tempString = "";
+    			stringstream inputString(line);						//converting the line variable into a string variable
+    			    			
+				//Storing the Roll Numbers
+    			getline(inputString, tempString, ',');
+    			BEBME_Roll[i] = atoi(tempString.c_str());
+				//Storing the Names
+    			getline(inputString, BEBME_Name[i], ',');
+    			//Storing the 14 different Lab Performance marks into a 2D array
+    			for (int j=0; j < 14; j++){						//Looping 14 times for 14 Lab Performance marks
+    				getline(inputString, tempString, ',');			//Putting it into a temp string variable
+    				BEBME_LP[i][j] = atoi(tempString.c_str());		//Converting that temp string variable into a integar type and storing it into the 2D array
+				}
+				//Storing the 14 different Lab Report marks into a 2D array
+				for (int k=0; k < 14; k++){						//Looping 14 times for 14 Lab Report Marks
+					getline(inputString, tempString,',');			//Putting it into a temp string variable
+					BEBME_LR[i][k] = atoi(tempString.c_str());		//Converting that temp string variable into a integar type and storing it into the 2D array
+				}
+				//Storing the Mid-term Marks
+				getline(inputString, tempString, ',');
+    			BEBME_MMarks[i] = atoi(tempString.c_str());
+				//Storing the Final-term Marks
+    			getline(inputString, tempString, ',');
+    			BEBME_FMarks[i] = atoi(tempString.c_str());
+				//Storing the CEA 
+				getline(inputString, tempString, '\n');
+    			BEBME_Cea[i] = atoi(tempString.c_str());
+    			line = "";
+    			i++;
+			}
+			sizee[0] = 100-i;
+			cout<<"Reading file 'BEBME-OOP-GRADES.csv'...\n";
+			BEBME_OOP.close();
+    	}
+    	
+    	void SaveFileBEBME() {
+    		ofstream BEBME_OOP;
+    		BEBME_OOP.open("BEBME-OOP-GRADES.csv");
+    		BEBME_OOP<<FileHeader<<endl;
+    		for (int i=0; i<size-sizee[0]; i++) {
+    			BEBME_OOP << BEBME_Roll[i] << ',' << BEBME_Name[i] << ',';
+    			for (int j=0; j < 14; j++) {
+    				BEBME_OOP << BEBME_LP[i][j] << ',';
+				}
+				for (int k=0; k < 14; k++) {
+					BEBME_OOP << BEBME_LR[i][k] << ',';
+				}
+				BEBME_OOP << BEBME_MMarks[i] << ',' << BEBME_FMarks[i] << ',' << BEBME_Cea[i] << BEBME_grade[i]<<endl;
+			}
+		}
+    	
+    	void ReadFileBEEPA() {
+    		
+    		ifstream BEEPA_OOP("POWER-CP.csv");				//Making the file variable and storing the file in it
+    		
+    		string line = "";										//line string to store the line of the file
+    		getline(BEEPA_OOP, line);								//Storing the first line of the file in the line variable
+    		line = "";												//The first line of this file has headers, this is to ignore that
+    		
+    		int i=0;
+    		while(getline(BEEPA_OOP, line)) {
+    			
+    			string tempString = "";
+    			stringstream inputString(line);						//converting the line variable into a string variable
+    			    			
+				//Storing the Roll Numbers
+    			getline(inputString, tempString, ',');
+    			BEEPA_Roll[i] = atoi(tempString.c_str());
+				//Storing the Names
+    			getline(inputString, BEEPA_Name[i], ',');
+    			//Storing the 14 different Lab Performance marks into a 2D array
+    			for (int j=0; j < 14; j++){						//Looping 14 times for 14 Lab Performance marks
+    				getline(inputString, tempString, ',');			//Putting it into a temp string variable
+    				BEEPA_LP[i][j] = atoi(tempString.c_str());		//Converting that temp string variable into a integar type and storing it into the 2D array
+				}
+				//Storing the 14 different Lab Report marks into a 2D array
+				for (int k=0; k < 14; k++){						//Looping 14 times for 14 Lab Report Marks
+					getline(inputString, tempString,',');			//Putting it into a temp string variable
+					BEEPA_LR[i][k] = atoi(tempString.c_str());		//Converting that temp string variable into a integar type and storing it into the 2D array
+				}
+				//Storing the Mid-term Marks
+				getline(inputString, tempString, ',');
+    			BEEPA_MMarks[i] = atoi(tempString.c_str());
+				//Storing the Final-term Marks
+    			getline(inputString, tempString, ',');
+    			BEEPA_FMarks[i] = atoi(tempString.c_str());
+				//Storing the CEA 
+				getline(inputString, tempString, '\n');
+    			BEEPA_Cea[i] = atoi(tempString.c_str());
+    			line = "";
+    			i++;
+			}
+			sizee[1] = 100-i;
+			cout<<"Reading file 'POWER-CP.csv'...\n";
+			BEEPA_OOP.close();
+    	}
+    	
+    	void SaveFileBEEPA() {
+    		ofstream BEEPA_OOP;
+    		BEEPA_OOP.open("POWER-CP.csv");
+    		BEEPA_OOP << FileHeader<<endl;
+    		for (int i=0; i<size-sizee[1]; i++) {
+    			BEEPA_OOP << BEEPA_Roll[i] << ',' << BEEPA_Name[i] << ',';
+    			for (int j=0; j < 14; j++) {
+    				BEEPA_OOP << BEEPA_LP[i][j] << ',';
+				}
+				for (int k=0; k < 14; k++) {
+					BEEPA_OOP << BEEPA_LR[i][k] << ',';
+				}
+				BEEPA_OOP << BEEPA_MMarks[i] << ',' << BEEPA_FMarks[i] << ',' << BEEPA_Cea[i] << BEEPA_grade[i] << endl;
+			}
+		}
+    	
+    	void ReadFileMTSA() {
+    		
+    		ifstream MTSA_OOP("MTSA-CP-GRADES.csv");				//Making the file variable and storing the file in it
+    		
+    		string line = "";										//line string to store the line of the file
+    		getline(MTSA_OOP, line);								//Storing the first line of the file in the line variable
+    		line = "";												//The first line of this file has headers, this is to ignore that
+    		
+    		int i=0;
+    		while(getline(MTSA_OOP, line)) {
+			
+			    			
+    			string tempString = "";
+    			stringstream inputString(line);						//converting the line variable into a string variable
+    			    			
+				//Storing the Roll Numbers
+    			getline(inputString, tempString, ',');
+    			MTSA_Roll[i] = atoi(tempString.c_str());
+				//Storing the Names
+    			getline(inputString, MTSA_Name[i], ',');
+    			//Storing the 14 different Lab Performance marks into a 2D array
+    			for (int j=0; j < 14; j++){						//Looping 14 times for 14 Lab Performance marks
+    				getline(inputString, tempString, ',');			//Putting it into a temp string variable
+    				MTSA_LP[i][j] = atoi(tempString.c_str());		//Converting that temp string variable into a integar type and storing it into the 2D array
+				}
+				//Storing the 14 different Lab Report marks into a 2D array
+				for (int k=0; k < 14; k++){						//Looping 14 times for 14 Lab Report Marks
+					getline(inputString, tempString,',');			//Putting it into a temp string variable
+					MTSA_LR[i][k] = atoi(tempString.c_str());		//Converting that temp string variable into a integar type and storing it into the 2D array
+				}
+				//Storing the Mid-term Marks
+				getline(inputString, tempString, ',');
+    			MTSA_MMarks[i] = atoi(tempString.c_str());
+				//Storing the Final-term Marks
+    			getline(inputString, tempString, ',');
+    			MTSA_FMarks[i] = atoi(tempString.c_str());
+				//Storing the CEA 
+				getline(inputString, tempString, '\n');
+    			MTSA_Cea[i] = atoi(tempString.c_str());
+    			line = "";
+    			i++;
+			}
+			sizee[2] = 100-i;
+			cout<<"Reading file 'MTSA-CP-GRADES.csv'...\n";
+			MTSA_OOP.close();
+    	}
+    	
+    	void SaveFileMTSA() {
+    		ofstream MTSA_OOP;
+    		MTSA_OOP.open("MTSA-CP-GRADES.csv");
+    		MTSA_OOP << FileHeader<<endl;
+    		for (int i=0; i<size-sizee[2]; i++) {
+    			MTSA_OOP << MTSA_Roll[i] << ',' << MTSA_Name[i] << ',';
+    			for (int j=0; j < 14; j++) {
+    				MTSA_OOP << MTSA_LP[i][j] << ',';
+				}
+				for (int k=0; k < 14; k++) {
+					MTSA_OOP << MTSA_LR[i][k] << ',';
+				}
+				MTSA_OOP << MTSA_MMarks[i] << ',' << MTSA_FMarks[i] << ',' << MTSA_Cea[i] << MTSA_grade << endl;
+			}
+		}
+    	
+    	void ReadFileMTSB() {
+    		
+    		ifstream MTSB_OOP("MTSB-CP-GRADES.csv");				//Making the file variable and storing the file in it
+    		
+    		string line = "";										//line string to store the line of the file
+    		getline(MTSB_OOP, line);								//Storing the first line of the file in the line variable
+    		line = "";												//The first line of this file has headers, this is to ignore that
+    		
+    		int i=0;
+    		while(getline(MTSB_OOP, line)) {
+    		
+    		
+    			
+    			string tempString = "";
+    			stringstream inputString(line);						//converting the line variable into a string variable
+    			    			
+				//Storing the Roll Numbers
+    			getline(inputString, tempString, ',');
+    			MTSB_Roll[i] = atoi(tempString.c_str());
+				//Storing the Names
+    			getline(inputString, MTSB_Name[i], ',');
+    			//Storing the 14 different Lab Performance marks into a 2D array
+    			for (int j=0; j < 14; j++){						//Looping 14 times for 14 Lab Performance marks
+    				getline(inputString, tempString, ',');			//Putting it into a temp string variable
+    				MTSB_LP[i][j] = atoi(tempString.c_str());		//Converting that temp string variable into a integar type and storing it into the 2D array
+				}
+				//Storing the 14 different Lab Report marks into a 2D array
+				for (int k=0; k < 14; k++){						//Looping 14 times for 14 Lab Report Marks
+					getline(inputString, tempString,',');			//Putting it into a temp string variable
+					MTSB_LR[i][k] = atoi(tempString.c_str());		//Converting that temp string variable into a integar type and storing it into the 2D array
+				}
+				//Storing the Mid-term Marks
+				getline(inputString, tempString, ',');
+    			MTSB_MMarks[i] = atoi(tempString.c_str());
+				//Storing the Final-term Marks
+    			getline(inputString, tempString, ',');
+    			MTSB_FMarks[i] = atoi(tempString.c_str());
+				//Storing the CEA 
+				getline(inputString, tempString, '\n');
+    			MTSB_Cea[i] = atoi(tempString.c_str());
+    			line = "";
+    			i++;
+			}
+			sizee[3] = 100-i;
+			cout<<"Reading file 'MTSB-CP-GRADES.csv'...\n";
+			MTSB_OOP.close();
+    	}
+    	
+    	void SaveFileMTSB() {
+    		ofstream MTSB_OOP;
+    		MTSB_OOP.open("MTSB-CP-GRADES.csv");
+    		MTSB_OOP << FileHeader<<endl;
+    		for (int i=0; i<size-sizee[3]; i++) {
+    			MTSB_OOP << MTSB_Roll[i] << ',' << MTSB_Name[i] << ',';
+    			for (int j=0; j < 14; j++) {
+    				MTSB_OOP << MTSB_LP[i][j] << ',';
+				}
+				for (int k=0; k < 14; k++) {
+					MTSB_OOP << MTSB_LR[i][k] << ',';
+				}
+				MTSB_OOP << MTSB_MMarks[i] << ',' << MTSB_FMarks[i] << ',' << MTSB_Cea[i] << MTSB_grade << endl;
+			}
+		}
+    	
+    	void DisplayStudentInfo(int roll) {
+    		for (int i=0; i < size; i++) {
+    			if (roll == BEBME_Roll[i]) {
+	    			cout<<"Roll Number: "<<BEBME_Roll[i]<<endl;
+	    			cout<<"Name: "<<BEBME_Name[i]<<endl;
+	    			cout<<"Lab Performance marks: ";
+	    			for (int j=0; j < 14; j++) {
+	    				cout<<BEBME_LP[i][j]<<", ";
+					}
+					cout<<"\nLab Report marks: ";
+					for (int k=0; k < 14; k++) {
+						cout<<BEBME_LR[i][k]<<", ";
+					}
+					cout<<"\nMid-Term marks: "<<BEBME_MMarks[i]<<endl;
+	    			cout<<"Final-Term marks: "<<BEBME_FMarks[i]<<endl;
+	    			cout<<"CEA Marks: "<<BEBME_Cea[i]<<endl;
+	    			cout<<"\n-----------------------------------------------------------------------\n";
+				}
+				if (roll == BEEPA_Roll[i]) {
+	    			cout<<"Roll Number: "<<BEEPA_Roll[i]<<endl;
+	    			cout<<"Name: "<<BEEPA_Name[i]<<endl;
+	    			cout<<"Lab Performance marks: ";
+	    			for (int j=0; j < 14; j++) {
+	    				cout<<BEEPA_LP[i][j]<<", ";
+					}
+					cout<<"\nLab Report marks: ";
+					for (int k=0; k < 14; k++) {
+						cout<<BEEPA_LR[i][k]<<", ";
+					}
+					cout<<"\nMid-Term marks: "<<BEEPA_MMarks[i]<<endl;
+	    			cout<<"Final-Term marks: "<<BEEPA_FMarks[i]<<endl;
+	    			cout<<"CEA Marks: "<<BEEPA_Cea[i]<<endl;
+	    			cout<<"\n-----------------------------------------------------------------------\n";
+				}
+				if (roll == MTSA_Roll[i]) {
+	    			cout<<"Roll Number: "<<MTSA_Roll[i]<<endl;
+	    			cout<<"Name: "<<MTSA_Name[i]<<endl;
+	    			cout<<"Lab Performance marks: ";
+	    			for (int j=0; j < 14; j++) {
+	    				cout<<MTSA_LP[i][j]<<", ";
+					}
+					cout<<"\nLab Report marks: ";
+					for (int k=0; k < 14; k++) {
+						cout<<MTSA_LR[i][k]<<", ";
+					}
+					cout<<"\nMid-Term marks: "<<MTSA_MMarks[i]<<endl;
+	    			cout<<"Final-Term marks: "<<MTSA_FMarks[i]<<endl;
+	    			cout<<"CEA Marks: "<<MTSA_Cea[i]<<endl;
+	    			cout<<"\n-----------------------------------------------------------------------\n";
+				}
+				if (roll == MTSB_Roll[i]) {
+	    			cout<<"Roll Number: "<<MTSB_Roll[i]<<endl;
+	    			cout<<"Name: "<<MTSB_Name[i]<<endl;
+	    			cout<<"Lab Performance marks: ";
+	    			for (int j=0; j < 14; j++) {
+	    				cout<<MTSB_LP[i][j]<<", ";
+					}
+					cout<<"\nLab Report marks: ";
+					for (int k=0; k < 14; k++) {
+						cout<<MTSB_LR[i][k]<<", ";
+					}
+					cout<<"\nMid-Term marks: "<<MTSB_MMarks[i]<<endl;
+	    			cout<<"Final-Term marks: "<<MTSB_FMarks[i]<<endl;
+	    			cout<<"CEA Marks: "<<MTSB_Cea[i]<<endl;
+	    			cout<<"\n-----------------------------------------------------------------------\n";
+				}
+			}
+		}
+		
+		
+		void LabMarksDisplay(int roll, string whichMarks) {
+			cout<<"\n-----------------------------------------------------------------------"<<endl;
+			for (int i=0; i<14; i++){
+				if(whichMarks == "BEBME_LP"){
+					cout<<"Lab "<<i + 1<<":\t"<<BEBME_LP[roll][i]<<endl;
+				} else if(whichMarks == "MTSA_LP"){
+					cout<<"Lab "<<i + 1<<":\t"<<MTSA_LP[roll][i]<<endl;
+				} else if(whichMarks == "MTSB_LP"){
+					cout<<"Lab "<<i + 1<<":\t"<<MTSB_LP[roll][i]<<endl;
+				} else if(whichMarks == "BEEPA_LP"){
+					cout<<"Lab "<<i + 1<<":\t"<<BEEPA_LP[roll][i]<<endl;
+				} else if(whichMarks == "BEBME_LR"){
+					cout<<"Lab "<<i + 1<<":\t"<<BEBME_LR[roll][i]<<endl;
+				} else if(whichMarks == "MTSA_LR"){
+					cout<<"Lab "<<i + 1<<":\t"<<MTSA_LR[roll][i]<<endl;
+				} else if(whichMarks == "MTSB_LR"){
+					cout<<"Lab "<<i + 1<<":\t"<<MTSB_LR[roll][i]<<endl;
+				} else if(whichMarks == "BEEPA_LR"){
+					cout<<"Lab "<<i + 1<<":\t"<<BEEPA_LR[roll][i]<<endl;
+				} 
+			}
+			cout<<"-----------------------------------------------------------------------"<<endl;
+		}
+		
+		void MarksDisplay(int roll, string whichMarks){
+			if(whichMarks == "BEBME_MMarks"){
+				cout<<"Midterm marks: "<<BEBME_MMarks[roll]<<endl;
+			} else if(whichMarks == "MTSA_MMarks"){
+				cout<<"Midterm marks: "<<MTSA_MMarks[roll]<<endl;
+			} else if(whichMarks == "MTSB_MMarks"){
+				cout<<"Midterm marks: "<<MTSB_MMarks[roll]<<endl;
+			} else if(whichMarks == "BEEPA_MMarks"){
+				cout<<"Midterm marks: "<<BEEPA_MMarks[roll]<<endl;
+			} else if(whichMarks == "BEBME_FMarks"){
+				cout<<"Final marks: "<<BEBME_FMarks[roll]<<endl;
+			} else if(whichMarks == "MTSA_FMarks"){
+				cout<<"Final marks: "<<MTSA_FMarks[roll]<<endl;
+			} else if(whichMarks == "MTSB_FMarks"){
+				cout<<"Final marks: "<<MTSB_FMarks[roll]<<endl;
+			} else if(whichMarks == "BEEPA_FMarks"){
+				cout<<"Final marks: "<<BEEPA_FMarks[roll]<<endl;
+			} else if(whichMarks == "BEBME_Cea"){
+				cout<<"CEAwhat marks: "<<BEBME_Cea[roll]<<endl;
+			} else if(whichMarks == "MTSA_Cea"){
+				cout<<"Final marks: "<<MTSA_Cea[roll]<<endl;
+			} else if(whichMarks == "MTSB_Cea"){
+				cout<<"Final marks: "<<MTSB_Cea[roll]<<endl;
+			} else if(whichMarks == "BEEPA_Cea"){
+				cout<<"Final marks: "<<BEEPA_Cea[roll]<<endl;
+			}
+		}
+		
+    	
+    	void EditMarks(TPortal t, int opt) {
+    		int roll, markSelect, rolltemp;
+    		float tempMarks;
+    		char markTypeSelect;
+			cout<<"Please Enter Roll Number Of The Student: ";
+    		cin>>roll;
+    		cout<<"\n-----------------------------------------------------------------------\n";
+			switch (opt){
+				case 1://BEBME
+					for(int i=0; i<size-sizee[0]; i++){
+						if(BEBME_Roll[i] == roll){
+							rolltemp = i;
+							t.DisplayStudentInfo(roll);
+							cout<<"Marks:\nA---------------Lab Performance\nB---------------Lab Report\nC---------------Mid terms\nD---------------Final terms\nE---------------CEA";
+							cout<<"\nEnter which marks you want to edit: ";
+							cin>>markTypeSelect;
+							switch (markTypeSelect){
+								case 'A':
+									t.LabMarksDisplay(rolltemp, "BEBME_LP");
+									cout<<"\nInput the number corresponding to the marks displayed: ";
+									cin>>markSelect;
+									markSelect = markSelect - 1;
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.BEBME_LP[i][markSelect] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.LabMarksDisplay(rolltemp, "BEBME_LP");
+									t.SaveFileBEBME();
+								break;
+								
+								case 'B':
+									t.LabMarksDisplay(rolltemp, "BEBME_LR");
+									cout<<"\nInput the number corresponding to the marks displayed: ";
+									cin>>markSelect;
+									markSelect = markSelect - 1;
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.BEBME_LR[i][markSelect] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.LabMarksDisplay(rolltemp, "BEBME_LR");
+									t.SaveFileBEBME();
+								break;
+								
+								case 'C':
+									t.MarksDisplay(rolltemp, "BEBME_MMarks");
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.BEBME_MMarks[i] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.MarksDisplay(rolltemp, "BEBME_MMarks");
+									t.SaveFileBEBME();
+								break;
+								
+								case 'D':
+									t.MarksDisplay(rolltemp, "BEBME_FMarks");
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.BEBME_FMarks[i] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.MarksDisplay(rolltemp, "BEBME_FMarks");
+									t.SaveFileBEBME();
+								break;
+									
+								case 'E':
+									t.MarksDisplay(rolltemp, "BEBME_Cea");
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.BEBME_Cea[i] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.MarksDisplay(rolltemp, "BEBME_Cea");
+									t.SaveFileBEBME();
+								break;
+							}
+						}
+					}
+				break;
+				
+				case 2://MTSA
+					for(int i=0; i<sizee[2]; i++){
+						if(MTSA_Roll[i] == roll){
+							cout<<"It does go here (if condition roll = roll).\n";
+							rolltemp = i;
+							t.DisplayStudentInfo(roll);
+							cout<<"Marks:\nA---------------Lab Performance\nB---------------Lab Report\nC---------------Mid terms\nD---------------Final terms\nE---------------CEA";
+							cout<<"\nEnter which marks you want to edit: ";
+							cin>>markTypeSelect;
+							switch (markTypeSelect){
+								case 'A':
+									t.LabMarksDisplay(rolltemp, "MTSA_LP");
+									cout<<"\nInput the number corresponding to the marks displayed: ";
+									cin>>markSelect;
+									markSelect = markSelect - 1;
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.MTSA_LP[i][markSelect] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.LabMarksDisplay(rolltemp, "MTSA_LP");
+									t.SaveFileMTSA();
+								break;
+								
+								case 'B':
+									t.LabMarksDisplay(rolltemp, "MTSA_LR");
+									cout<<"\nInput the number corresponding to the marks displayed: ";
+									cin>>markSelect;
+									markSelect = markSelect - 1;
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.MTSA_LR[i][markSelect] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.LabMarksDisplay(rolltemp, "MTSA_LR");
+									t.SaveFileMTSA();
+								break;
+								
+								case 'C':
+									t.MarksDisplay(rolltemp, "MTSA_MMarks");
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.MTSA_MMarks[i] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.MarksDisplay(rolltemp, "MTSA_MMarks");
+									t.SaveFileMTSA();
+								break;
+								
+								case 'D':
+									t.MarksDisplay(rolltemp, "MTSA_FMarks");
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.MTSA_FMarks[i] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.MarksDisplay(rolltemp, "MTSA_FMarks");
+									t.SaveFileMTSA();
+								break;
+									
+								case 'E':
+									t.MarksDisplay(rolltemp, "MTSA_Cea");
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.MTSA_Cea[i] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.MarksDisplay(rolltemp, "MTSA_Cea");
+									t.SaveFileMTSA();
+								break;
+							}
+						}
+					}
+				break;
+				
+				case 3://MTSB
+					for(int i=0; i<size-sizee[3]; i++){
+						if(MTSB_Roll[i] == roll){
+							rolltemp = i;
+							t.DisplayStudentInfo(roll);
+							cout<<"Marks:\nA---------------Lab Performance\nB---------------Lab Report\nC---------------Mid terms\nD---------------Final terms\nE---------------CEA";
+							cout<<"\nEnter which marks you want to edit: ";
+							cin>>markTypeSelect;
+							switch (markTypeSelect){
+								case 'A':
+									t.LabMarksDisplay(rolltemp, "MTSB_LP");
+									cout<<"\nInput the number corresponding to the marks displayed: ";
+									cin>>markSelect;
+									markSelect = markSelect - 1;
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.MTSB_LP[i][markSelect] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.LabMarksDisplay(rolltemp, "MTSB_LP");
+									t.SaveFileMTSB();
+								break;
+								
+								case 'B':
+									t.LabMarksDisplay(rolltemp, "MTSB_LR");
+									cout<<"\nInput the number corresponding to the marks displayed: ";
+									cin>>markSelect;
+									markSelect = markSelect - 1;
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.MTSB_LR[i][markSelect] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.LabMarksDisplay(rolltemp, "MTSB_LR");
+									t.SaveFileMTSB();
+								break;
+								
+								case 'C':
+									t.MarksDisplay(rolltemp, "MTSB_MMarks");
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.MTSB_MMarks[i] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.MarksDisplay(rolltemp, "MTSB_MMarks");
+									t.SaveFileMTSB();
+								break;
+								
+								case 'D':
+									t.MarksDisplay(rolltemp, "MTSB_FMarks");
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.MTSB_FMarks[i] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.MarksDisplay(rolltemp, "MTSB_FMarks");
+									t.SaveFileMTSB();
+								break;
+									
+								case 'E':
+									t.MarksDisplay(rolltemp, "MTSB_Cea");
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.MTSB_Cea[i] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.MarksDisplay(rolltemp, "MTSB_Cea");
+									t.SaveFileMTSB();
+								break;
+							}
+						}
+					}	
+				break;
+				
+				case 4://BEEPA
+					for(int i=0; i<size-sizee[1]; i++){
+						if(BEEPA_Roll[i] == roll){
+							rolltemp = i;
+							t.DisplayStudentInfo(roll);
+							cout<<"Marks:\nA---------------Lab Performance\nB---------------Lab Report\nC---------------Mid terms\nD---------------Final terms\nE---------------CEA";
+							cout<<"\nEnter which marks you want to edit: ";
+							cin>>markTypeSelect;
+							switch (markTypeSelect){
+								case 'A':
+									t.LabMarksDisplay(rolltemp, "BEEPA_LP");
+									cout<<"\nInput the number corresponding to the marks displayed: ";
+									cin>>markSelect;
+									markSelect = markSelect - 1;
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.BEEPA_LP[i][markSelect] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.LabMarksDisplay(rolltemp, "BEEPA_LP");
+									t.SaveFileBEEPA();
+								break;
+								
+								case 'B':
+									t.LabMarksDisplay(rolltemp, "BEEPA_LR");
+									cout<<"\nInput the number corresponding to the marks displayed: ";
+									cin>>markSelect;
+									markSelect = markSelect - 1;
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.BEEPA_LR[i][markSelect] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.LabMarksDisplay(rolltemp, "BEEPA_LR");
+									t.SaveFileBEEPA();
+								break;
+								
+								case 'C':
+									t.MarksDisplay(rolltemp, "BEEPA_MMarks");
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.BEEPA_MMarks[i] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.MarksDisplay(rolltemp, "BEEPA_MMarks");
+									t.SaveFileBEEPA();
+								break;
+								
+								case 'D':
+									t.MarksDisplay(rolltemp, "BEEPA_FMarks");
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									
+									t.BEEPA_FMarks[i] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.MarksDisplay(rolltemp, "BEEPA_FMarks");
+									t.SaveFileBEEPA();
+								break;
+									
+								case 'E':
+									t.MarksDisplay(rolltemp, "BEEPA_Cea");
+									cout<<"\nPlease enter the marks you'd like to replace the selected marks with: ";
+									cin>>tempMarks;
+									t.BEEPA_Cea[i] = tempMarks;
+									cout<<"\nMarks Updated Successfully!\n";
+									t.MarksDisplay(rolltemp, "BEEPA_Cea");
+									t.SaveFileBEEPA();
+								break;
+							}
+						}
+					}	
+				break;
+			}
+			
+		}
+		
+		void AddStudent(int opt) {
+			if (opt == 1) {				//BEBME
+				sizee[0] = sizee[0] - 1;
+				int i = 0; 
+				i = size-sizee[0];
+				
+				cout<<"Enter Student's Roll Number: ";
+				cin>>BEBME_Roll[i];
+				cout<<"Enter Student's Name: ";
+				cin>>BEBME_Name[i];
+				for (int j=0; j<14; j++) {
+					cout<<"Enter Student's Lab "<<j+1<<" Lab Performance Marks: ";
+					cin>>BEBME_LP[i][j];
+				}
+				for (int k=0; k<14; k++){
+					cout<<"Enter Student's Lab "<<k+1<<" Lab Report Marks: ";
+					cin>>BEBME_LR[i][k];
+				}
+				cout<<"Enter Student's Mid term Marks: ";
+				cin>>BEBME_MMarks[i];
+				cout<<"Enter Student's Final term Marks: ";
+				cin>>BEBME_FMarks[i];
+				cout<<"Enter Student's CEA Marks: ";
+				cin>>BEBME_Cea[i];
+					
+				fstream BEBME_OOP;
+    			BEBME_OOP.open("BEBME-OOP-GRADES.csv", ios::out | ios::app);
+    			BEBME_OOP << BEBME_Roll[i] << ',' << BEBME_Name[i] << ',';
+    		for (int j=0; j < 14; j++) {
+    			BEBME_OOP << BEBME_LP[i][j] << ',';
+			}
+			for (int k=0; k < 14; k++) {
+				BEBME_OOP << BEBME_LR[i][k] << ',';
+			}
+			BEBME_OOP << BEBME_MMarks[i] << ',' << BEBME_FMarks[i] << ',' << BEBME_Cea[i] << endl;
+				
+			} else if (opt == 2) {		//MTSA
+				sizee[2] = sizee[2] - 1;
+				int l = size-sizee[2];
+				
+				cout<<"Enter Student's Roll Number: ";
+				cin>>MTSA_Roll[l];
+				cout<<"Enter Student's Name: ";
+				cin>>MTSA_Name[l];
+				for (int j=0; j<14; j++) {
+					cout<<"Enter Student's Lab "<<j+1<<" Lab Performance Marks: ";
+					cin>>MTSA_LP[l][j];
+				}
+				for (int k=0; k<14; k++){
+					cout<<"Enter Student's Lab "<<k+1<<" Lab Report Marks: ";
+					cin>>MTSA_LR[l][k];
+				}
+				cout<<"Enter Student's Mid term Marks: ";
+				cin>>MTSA_MMarks[l];
+				cout<<"Enter Student's Final term Marks: ";
+				cin>>MTSA_FMarks[l];
+				cout<<"Enter Student's CEA Marks: ";
+				cin>>MTSA_Cea[l];
+				
+				fstream MTSA_OOP;
+    			MTSA_OOP.open("MTSA-CP-GRADES.csv", ios::out | ios::app);
+    			MTSA_OOP << MTSA_Roll[l] << ',' << MTSA_Name[l] << ',';
+    			for (int j=0; j < 14; j++) {
+    			MTSA_OOP << MTSA_LP[l][j] << ',';
+				}
+				for (int k=0; k < 14; k++) {
+				MTSA_OOP << MTSA_LR[l][k] << ',';
+				}
+				MTSA_OOP << MTSA_MMarks[l] << ',' << MTSA_FMarks[l] << ',' << MTSA_Cea[l] << endl;
+				
+			} else if (opt == 3) {		//MTSB
+				sizee[3] = sizee[3] - 1;
+				int m = size - sizee[3];
+				
+				cout<<"Enter Student's Roll Number: ";
+				cin>>MTSB_Roll[m];
+				cout<<"Enter Student's Name: ";
+				cin>>MTSB_Name[m];
+				for (int j=0; j<14; j++) {
+					cout<<"Enter Student's Lab "<<j+1<<" Lab Performance Marks: ";
+					cin>>MTSB_LP[m][j];
+				}
+				for (int k=0; k<14; k++){
+					cout<<"Enter Student's Lab "<<k+1<<" Lab Report Marks: ";
+					cin>>MTSB_LR[m][k];
+				}
+				cout<<"Enter Student's Mid term Marks: ";
+				cin>>MTSB_MMarks[m];
+				cout<<"Enter Student's Final term Marks: ";
+				cin>>MTSB_FMarks[m];
+				cout<<"Enter Student's CEA Marks: ";
+				cin>>MTSB_Cea[m];
+				
+				fstream MTSB_OOP;
+    			MTSB_OOP.open("MTSB-CP-GRADES.csv", ios::out | ios::app);
+    			MTSB_OOP << MTSB_Roll[m] << ',' << MTSB_Name[m] << ',';
+    			for (int j=0; j < 14; j++) {
+    			MTSB_OOP << MTSB_LP[m][j] << ',';
+				}
+				for (int k=0; k < 14; k++) {
+				MTSB_OOP << MTSB_LR[m][k] << ',';
+				}
+				MTSB_OOP << MTSB_MMarks[m] << ',' << MTSB_FMarks[m] << ',' << MTSB_Cea[m] << endl;
+				
+			} else if (opt == 4) {		//BEEPA
+				sizee[1] = sizee[1] - 1;
+				int n = size - sizee[1];
+				
+				cout<<"Enter Student's Roll Number: ";
+				cin>>BEEPA_Roll[n];
+				cout<<"Enter Student's Name: ";
+				cin>>BEEPA_Name[n];
+				for (int j=0; j<14; j++) {
+					cout<<"Enter Student's Lab "<<j+1<<" Lab Performance Marks: ";
+					cin>>BEEPA_LP[n][j];
+				}
+				for (int k=0; k<14; k++){
+					cout<<"Enter Student's Lab "<<k+1<<" Lab Report Marks: ";
+					cin>>BEEPA_LR[n][k];
+				}
+				cout<<"Enter Student's Mid term Marks: ";
+				cin>>BEEPA_MMarks[n];
+				cout<<"Enter Student's Final term Marks: ";
+				cin>>BEEPA_FMarks[n];
+				cout<<"Enter Student's CEA Marks: ";
+				cin>>BEEPA_Cea[n];
+				
+				fstream BEEPA_OOP;
+    			BEEPA_OOP.open("POWER-CP.csv", ios::out | ios::app);
+    			BEEPA_OOP << BEEPA_Roll[n] << ',' << BEEPA_Name[n] << ',';
+    			for (int j=0; j < 14; j++) {
+    			BEEPA_OOP << BEEPA_LP[n][j] << ',';
+				}
+				for (int k=0; k < 14; k++) {
+				BEEPA_OOP << BEEPA_LR[n][k] << ',';
+				}
+				BEEPA_OOP << BEEPA_MMarks[n] << ',' << BEEPA_FMarks[n] << ',' << BEEPA_Cea[n] << endl;
+			}
+		}
+		
+		void weightage(){
+			cout<<"Enter the weightage percentage for Lab Performance: ";
+			cin>>weight_LP;
+			cout<<"Enter the weightage percentage for Lab Reports: ";
+			cin>>weight_LR;
+			cout<<"Enter the weightage percentage for Midterm Examination: ";
+			cin>>weight_Mid;
+			cout<<"Enter the weightage percentage for Final Examination: ";
+			cin>>weight_Final;
+			cout<<"Enter the weightage percentage for CEA: ";
+			cin>>weight_Cea;
+		}
+		
+		void totalMarks(int opt){
+			float sum = 0;
+			if (opt == 1){  //BEBME
+				for (int i = 0; i < size - sizee[0]; i++){
+					for (int j = 0; j < 14; j++){
+						sum = sum + BEBME_LP[i][j];
+					}
+					BEBME_totalLP[i] = sum/210/100*weight_LP;
+					sum = 0;
+				}
+				for (int i = 0; i < size - sizee[0]; i++){
+					for (int j = 0; j < 14; j++){
+						sum = sum + BEBME_LR[i][j];
+					}
+					BEBME_totalLR[i] = (sum/210)*weight_LR;
+					sum = 0;
+				}
+				for (int i = 0; i < size - sizee[0]; i++){
+				BEBME_totalMid[i] = BEBME_MMarks[i]/40*weight_Mid;
+				}
+				for (int i = 0; i < size - sizee[0]; i++){
+				BEBME_totalFinal[i] = BEBME_FMarks[i]/50*weight_Final;
+				}
+				for (int i = 0; i < size - sizee[0]; i++){
+				BEBME_totalCea[i] = BEBME_Cea[i]/20*weight_Cea;
+				}
+			}
+			if (opt == 2){  //MTSA
+				for (int i = 0; i < size - sizee[0]; i++){
+					for (int j = 0; j < 14; j++){
+						sum = sum + MTSA_LP[i][j];
+					}
+					MTSA_totalLP[i] = sum/210*weight_LP;
+					sum = 0;
+				}
+				for (int i = 0; i < size - sizee[2]; i++){
+					for (int j = 0; j < 14; j++){
+						sum = sum + MTSA_LR[i][j];
+					}
+					MTSA_totalLR[i] = (sum/210)*weight_LR;
+					sum = 0;
+				}
+				for (int i = 0; i < size - sizee[2]; i++){
+				MTSA_totalMid[i] = MTSA_MMarks[i]/40*weight_Mid;
+				}
+				for (int i = 0; i < size - sizee[2]; i++){
+				MTSA_totalFinal[i] = MTSA_FMarks[i]/50*weight_Final;
+				}
+				for (int i = 0; i < size - sizee[2]; i++){
+				MTSA_totalCea[i] = MTSA_Cea[i]/20*weight_Cea;
+				}
+			}
+			if (opt == 3){  //MTSB
+				for (int i = 0; i < size - sizee[3]; i++){
+					for (int j = 0; j < 14; j++){
+						sum = sum + MTSB_LP[i][j];
+					}
+					MTSB_totalLP[i] = (sum/210)*weight_LP;
+					sum = 0;
+				}
+				for (int i = 0; i < size - sizee[3]; i++){
+					for (int j = 0; j < 14; j++){
+					}
+					MTSB_totalLR[i] = (sum/210)*weight_LR;
+					sum = 0;
+				}
+				for (int i = 0; i < size - sizee[3]; i++){
+				MTSB_totalMid[i] = MTSB_MMarks[i]/40*weight_Mid;
+				}
+				for (int i = 0; i < size - sizee[3]; i++){
+				MTSB_totalFinal[i] = MTSB_FMarks[i]/50*weight_Final;
+				}
+				for (int i = 0; i < size - sizee[3]; i++){
+				MTSB_totalCea[i] = MTSB_Cea[i]/20*weight_Cea;
+				}
+			}
+			if (opt == 4){  //BEEPA
+				for (int i = 0; i < size - sizee[1]; i++){
+					for (int j = 0; j < 14; j++){
+						sum = sum + BEEPA_LP[i][j];
+					}
+					BEEPA_totalLP[i] = (sum/210)*weight_LP;
+					sum = 0;
+				}
+				for (int i = 0; i < size - sizee[1]; i++){
+					for (int j = 0; j < 14; j++){
+						sum = sum + BEEPA_LR[i][j];
+					}
+					BEEPA_totalLR[i] = (sum/210)*weight_LR;
+					sum = 0;
+				}
+				for (int i = 0; i < size - sizee[1]; i++){
+					BEEPA_totalMid[i] = BEEPA_MMarks[i]/40*weight_Mid;
+				}
+				for (int i = 0; i < size - sizee[1]; i++){
+					BEEPA_totalFinal[i] = BEEPA_FMarks[i]/50*weight_Final;
+				}
+				for (int i = 0; i < size - sizee[1]; i++){
+					BEEPA_totalCea[i] = BEEPA_Cea[i]/20*weight_Cea;
+				}
+			}
+		}
+		
+		void generateGrades(int opt) {
+			if (opt == 1){
+				for (int i = 0; i < size - sizee[0]; i++){
+					BEBME_total[i] = BEBME_totalLP[i] + BEBME_totalLR[i] + BEBME_totalMid[i] + BEBME_totalFinal[i] + BEBME_totalCea[i];
+				if (BEBME_total[i] >= 80){
+					BEBME_grade[i] = 'A';
+				}
+				else if (BEBME_total[i] >= 70){
+					BEBME_grade[i] = 'B';
+				}
+				else if (BEBME_total[i] >= 60){
+					BEBME_grade[i] = 'C';
+				}
+				else if (BEBME_total[i] >= 50){
+					BEBME_grade[i] = 'D';
+				}
+				else if (BEBME_total[i] >= 40){
+					BEBME_grade[i] = 'E';
+				}
+				else if (BEBME_total[i] < 40){
+					BEBME_grade[i] = 'F';
+				}
+			}
+		}	
+			if (opt == 2){
+				for (int i = 0; i < size - sizee[2]; i++){
+					MTSA_total[i] = MTSA_totalLP[i] + MTSA_totalLR[i] + MTSA_totalMid[i] + MTSA_totalFinal[i] + MTSA_totalCea[i];
+				if (MTSA_total[i] >= 80){
+					MTSA_grade[i] = 'A';
+				}
+				else if (MTSA_total[i] >= 70){
+					MTSA_grade[i] = 'B';
+				}
+				else if (MTSA_total[i] >= 60){
+					MTSA_grade[i] = 'C';
+				}
+				else if (MTSA_total[i] >= 50){
+					MTSA_grade[i] = 'D';
+				}
+				else if (MTSA_total[i] >= 40){
+					MTSA_grade[i] = 'E';
+				}
+				else if (MTSA_total[i] < 40){
+					MTSA_grade[i] = 'F';
+				}	
+			}
+		}
+			if (opt == 3){
+				for (int i = 0; i < size - sizee[3]; i++){
+					MTSB_total[i] = MTSB_totalLP[i] + MTSB_totalLR[i] + MTSB_totalMid[i] + MTSB_totalFinal[i] + MTSB_totalCea[i];
+					if (MTSB_total[i] >= 80){
+						MTSB_grade[i] = 'A';
+					}
+					else if (MTSB_total[i] >= 70){
+						MTSB_grade[i] = 'B';
+					}
+					else if (MTSB_total[i] >= 60){
+						MTSB_grade[i] = 'C';
+					}
+					else if (MTSB_total[i] >= 50){
+						MTSB_grade[i] = 'D';
+					}
+					else if (MTSB_total[i] >= 40){
+						MTSB_grade[i] = 'E';
+					}
+					else if (MTSB_total[i] < 40){
+						MTSB_grade[i] = 'F';
+					}
+				}
+			}
+			if (opt == 4){
+				for (int i = 0; i < size - sizee[1]; i++){
+					BEEPA_total[i] = BEEPA_totalLP[i] + BEEPA_totalLR[i] + BEEPA_totalMid[i] + BEEPA_totalFinal[i] + BEEPA_totalCea[i];
+				
+				if (BEEPA_total[i] >= 80){
+					BEEPA_grade[i] = 'A';
+				}
+				else if (BEEPA_total[i] >= 70){
+					BEEPA_grade[i] = 'B';
+				}
+				else if (BEEPA_total[i] >= 60){
+					BEEPA_grade[i] = 'C';
+				}
+				else if (BEEPA_total[i] >= 50){
+					BEEPA_grade[i] = 'D';
+				}
+				else if (BEEPA_total[i] >= 40){
+					BEEPA_grade[i] = 'E';
+				}
+				else if (BEEPA_total[i] < 40){
+					BEEPA_grade[i] = 'F';
+				}
+			}
+		}
+	}
+	
+		void deleteStudent(int opt) {
+    		int delRoll;
+    		//BEBME
+    		if (opt == 1) {
+    			cout<<"Enter roll number to Delete Student: ";
+    			cin>>delRoll;
+    			fstream BEBME_OOP;
+    			BEBME_OOP.open("BEBME-OOP-GRADES.csv", ios::out|ios::trunc);
+    			BEBME_OOP<<FileHeader<<endl;
+    			for(int i=0; i < size-sizee[0]; i++){
+    				if (BEBME_Roll[i] == delRoll) {
+    					cout<<"\nStudent Found.\n";
+						for(int h=i+1; h < (size-sizee[0]); h++){
+    						BEBME_OOP << BEBME_Roll[h] << ',' << BEBME_Name[h] << ',';
+    						for (int j=0; j < 14; j++) {
+    							BEBME_OOP << BEBME_LP[h][j] << ',';
+							}
+							for (int k=0; k < 14; k++) {
+								BEBME_OOP << BEBME_LR[h][k] << ',';
+							}
+							BEBME_OOP << BEBME_MMarks[h] << ',' << BEBME_FMarks[h] << ',' << BEBME_Cea[h] << endl;
+						}
+						i++;
+						break;
+					}
+    				BEBME_OOP << BEBME_Roll[i] << ',' << BEBME_Name[i] << ',';
+    				for (int j=0; j < 14; j++) {
+    					BEBME_OOP << BEBME_LP[i][j] << ',';
+					}
+					for (int k=0; k < 14; k++) {
+						BEBME_OOP << BEBME_LR[i][k] << ',';
+					}
+					BEBME_OOP << BEBME_MMarks[i] << ',' << BEBME_FMarks[i] << ',' << BEBME_Cea[i] << endl;
+				}
+				cout<<"\nStudent Has Been Terminated.\n";
+    			
+			} else if (opt == 2) {
+				
+				cout<<"Enter roll number to Delete Student: ";
+    			cin>>delRoll;
+    			fstream MTSA_OOP;
+    			MTSA_OOP.open("MTSA-CP-GRADES.csv", ios::out|ios::trunc);
+    			MTSA_OOP<<FileHeader<<endl;
+    			for(int i=0; i < size-sizee[2]; i++){
+    				if (MTSA_Roll[i] == delRoll) {
+    					cout<<"\nStudent Found.\n";
+						for(int h=i+1; h < (size-sizee[2]); h++){
+    						MTSA_OOP << MTSA_Roll[h] << ',' << MTSA_Name[h] << ',';
+    						for (int j=0; j < 14; j++) {
+    							MTSA_OOP << MTSA_LP[h][j] << ',';
+							}
+							for (int k=0; k < 14; k++) {
+								MTSA_OOP << MTSA_LR[h][k] << ',';
+							}
+							MTSA_OOP << MTSA_MMarks[h] << ',' << MTSA_FMarks[h] << ',' << MTSA_Cea[h] << endl;
+						}
+						i++;
+						break;
+					}
+    				MTSA_OOP << MTSA_Roll[i] << ',' << MTSA_Name[i] << ',';
+    				for (int j=0; j < 14; j++) {
+    					MTSA_OOP << MTSA_LP[i][j] << ',';
+					}
+					for (int k=0; k < 14; k++) {
+						MTSA_OOP << MTSA_LR[i][k] << ',';
+					}
+					MTSA_OOP << MTSA_MMarks[i] << ',' << MTSA_FMarks[i] << ',' << MTSA_Cea[i] << endl;
+				}
+				cout<<"\nStudent Has Been Terminated.\n";
+				
+			} else if (opt == 3) {
+				
+				cout<<"Enter roll number to Delete Student: ";
+    			cin>>delRoll;
+    			fstream MTSB_OOP;
+    			MTSB_OOP.open("MTSB-CP-GRADES.csv", ios::out|ios::trunc);
+    			MTSB_OOP<<FileHeader<<endl;
+    			for(int i=0; i < size-sizee[3]; i++){
+    				if (MTSB_Roll[i] == delRoll) {
+    					cout<<"\nStudent Found.\n";
+						for(int h=i+1; h < (size-sizee[3]); h++){
+    						MTSB_OOP << MTSB_Roll[h] << ',' << MTSB_Name[h] << ',';
+    						for (int j=0; j < 14; j++) {
+    							MTSB_OOP << MTSB_LP[h][j] << ',';
+							}
+							for (int k=0; k < 14; k++) {
+								MTSB_OOP << MTSB_LR[h][k] << ',';
+							}
+							MTSB_OOP << MTSB_MMarks[h] << ',' << MTSB_FMarks[h] << ',' << MTSB_Cea[h] << endl;
+						}
+						i++;
+						break;
+					}
+    				MTSB_OOP << MTSB_Roll[i] << ',' << MTSB_Name[i] << ',';
+    				for (int j=0; j < 14; j++) {
+    					MTSB_OOP << MTSB_LP[i][j] << ',';
+					}
+					for (int k=0; k < 14; k++) {
+						MTSB_OOP << MTSB_LR[i][k] << ',';
+					}
+					MTSB_OOP << MTSB_MMarks[i] << ',' << MTSB_FMarks[i] << ',' << MTSB_Cea[i] << endl;
+				}
+				cout<<"\nStudent Has Been Terminated.\n";
+				
+			} else if (opt == 4) {
+				
+				cout<<"Enter roll number to Delete Student: ";
+    			cin>>delRoll;
+    			fstream BEEPA_OOP;
+    			BEEPA_OOP.open("POWER-CP.csv", ios::out|ios::trunc);
+    			BEEPA_OOP<<FileHeader<<endl;
+    			for(int i=0; i < size-sizee[1]; i++){
+    				if (BEEPA_Roll[i] == delRoll) {
+    					cout<<"\nStudent Found.\n";
+						for(int h=i+1; h < (size-sizee[1]); h++){
+    						BEEPA_OOP << BEEPA_Roll[h] << ',' << BEEPA_Name[h] << ',';
+    						for (int j=0; j < 14; j++) {
+    							BEEPA_OOP << BEEPA_LP[h][j] << ',';
+							}
+							for (int k=0; k < 14; k++) {
+								BEEPA_OOP << BEEPA_LR[h][k] << ',';
+							}
+							BEEPA_OOP << BEEPA_MMarks[h] << ',' << BEEPA_FMarks[h] << ',' << BEEPA_Cea[h] << endl;
+						}
+						i++;
+						break;
+					}
+    				BEEPA_OOP << BEEPA_Roll[i] << ',' << BEEPA_Name[i] << ',';
+    				for (int j=0; j < 14; j++) {
+    					BEEPA_OOP << BEEPA_LP[i][j] << ',';
+					}
+					for (int k=0; k < 14; k++) {
+						BEEPA_OOP << BEEPA_LR[i][k] << ',';
+					}
+					BEEPA_OOP << BEEPA_MMarks[i] << ',' << BEEPA_FMarks[i] << ',' << BEEPA_Cea[i] << endl;
+				}
+				cout<<"\nStudent Has Been Terminated.\n";
+				
+			}
+    		
+		}
+
+		
+        void menu(TPortal t) {
+            bool flag=true;
+            int classNum;
+            int menuOption;
+            
+            system("Color 0B");
+            cout<<"________________________________________________________________________________\n\n:::::::::::::::::::     Welcome to the Teacher's Portal     ::::::::::::::::::::\n\n________________________________________________________________________________";
+            while (flag = true) {
+                t.ReadFileBEBME();
+                t.ReadFileMTSA();
+                t.ReadFileMTSB();
+                t.ReadFileBEEPA();
+                cout<<"\nClasses Available For Accessing:\n________________________________________________________________________________";
+                cout<<"\n1. BEBME\n2. MTSA\n3. MTSB\n4. BEEPA\n\nEnter Any Class Number (Press 0 to exit the program): ";
+                cin>>classNum;
+                if (classNum == 0) exit(0);
+                cout<<"________________________________________________________________________________\n1.Add New Student Data\n2.Edit Existing Student Data\n3.Delete The Student.\n4.Generate Total Marks.\n5.Enter Marks Weight.\n6.Generate Student Grades.\n\nChoose An Option(Press 0 to exit:) ";
+                cin>>menuOption;
+                if (menuOption == 1){
+                    t.AddStudent(classNum);
+                } else if (menuOption == 2) {
+                    t.EditMarks(t, classNum);
+                } else if (menuOption == 3) {
+                    t.deleteStudent(classNum);
+                } else if (menuOption == 4){
+                    t.totalMarks(classNum);
+                } else if (menuOption == 5) {
+                    t.weightage();
+                } else if (menuOption == 6) {
+                    t.generateGrades(classNum);
+                    t.SaveFileBEBME();
+                    t.SaveFileBEEPA();
+                    t.SaveFileMTSA();
+                    t.SaveFileMTSB();
+                } else if (menuOption == 0) {
+                   exit(0);
+                }
+            }
+            
+        }
+};
+
+class GamingZone
+{
+protected:
+	char placeHoldersBox[10];
+    string playerName[3];
+public:
+ GamingZone();
+ ~GamingZone();
+    int checkwin();
+    void TICTACTOE_board(string name1, string name2);
+    void run();
+};
+
+GamingZone::GamingZone()
+{
+	//placeHoldersBox[10] = { 'o','a','b','c','d','e','f','g','h','i' };
+	placeHoldersBox[0]= 'o';
+	placeHoldersBox[1]='a';
+	placeHoldersBox[2]='b';
+	placeHoldersBox[3]='c';
+	placeHoldersBox[4]='d';
+	placeHoldersBox[5]='e';
+	placeHoldersBox[6]='f';
+	placeHoldersBox[7]='g';
+	placeHoldersBox[8]='h';
+	placeHoldersBox[9]='i';
+    for (int i = 0; i < 3; i++)
+    {
+        playerName[i] = "";
+    }
+}
+
+GamingZone::~GamingZone()
+{
+    //Destructor will be called automatically
+}
+
+int GamingZone::checkwin()
+{
+    if (placeHoldersBox[1] == placeHoldersBox[2] && placeHoldersBox[2] == placeHoldersBox[3])
+    {
+        return 1;
+    }
+    else if (placeHoldersBox[4] == placeHoldersBox[5] && placeHoldersBox[5] == placeHoldersBox[6])
+    {
+        return 1;
+    }
+
+    else if (placeHoldersBox[7] == placeHoldersBox[8] && placeHoldersBox[8] == placeHoldersBox[9])
+    {
+        return 1;
+    }
+    else if (placeHoldersBox[1] == placeHoldersBox[4] && placeHoldersBox[4] == placeHoldersBox[7])
+    {
+        return 1;
+    }
+    else if (placeHoldersBox[2] == placeHoldersBox[5] && placeHoldersBox[5] == placeHoldersBox[8])
+    {
+        return 1;
+    }
+    else if (placeHoldersBox[3] == placeHoldersBox[6] && placeHoldersBox[6] == placeHoldersBox[9])
+    {
+        return 1;
+    }
+    else if (placeHoldersBox[1] == placeHoldersBox[5] && placeHoldersBox[5] == placeHoldersBox[9])
+    {
+        return 1;
+    }
+
+    else if (placeHoldersBox[3] == placeHoldersBox[5] && placeHoldersBox[5] == placeHoldersBox[7])
+    {
+        return 1;
+    }
+    //Conditions for a tie match
+    else if (placeHoldersBox[1] != 'a' && placeHoldersBox[2] != 'b' && placeHoldersBox[3] != 'c' && placeHoldersBox[4] != 'd' && placeHoldersBox[5] != 'e' && placeHoldersBox[6] != 'f' && placeHoldersBox[7] != 'g' && placeHoldersBox[8] != 'h' && placeHoldersBox[9] != 'i')
+    {
+        return 0;
+    }
+
+    else//If the game is in progress
+    {
+        return -1;
+    }
+}
+
+void GamingZone::TICTACTOE_board(string name1, string name2)
+{
+    system("cls");//clearing the screen every time
+    cout << endl << "TIC TAC TOE" << endl;
+
+    cout << endl << "You have to use lowercase letters for input" << endl;
+
+    cout << "For " << name1 << " ====> (X)" << endl;
+    cout << "For " << name2 << " ====> (O)" << endl << endl;
+
+    cout << "     |       |     " << endl;
+    cout << " " << placeHoldersBox[1] << "   |   " << placeHoldersBox[2] << "   |   " << placeHoldersBox[3] << endl;
+
+    cout << "_____|_______|_____" << endl;
+    cout << "     |       | " << endl;
+
+    cout << " " << placeHoldersBox[4] << "   |   " << placeHoldersBox[5] << "   |   " << placeHoldersBox[6] << endl;
+
+    cout << "_____|_______|_____" << endl;
+    cout << "     |       | " << endl;
+
+    cout << " " << placeHoldersBox[7] << "   |   " << placeHoldersBox[8] << "   |   " << placeHoldersBox[9] << endl;
+
+    cout << "     |       | " << endl << endl;
+}
+
+void GamingZone::run()
+{
+    system("Color E5");
+    int player = 1, i;
+    char choice;
+
+
+    cout << "Enter Player 1 name: "; cin >> playerName[1];
+    cout << "Enter Player 2 name: "; cin >> playerName[2];
+    system("CLS");
+
+    char move;
+    do
+    {
+        TICTACTOE_board(playerName[1], playerName[2]);
+
+        if (player % 2)
+        {
+            system("Color 71");
+            player = 1;
+        }
+        else
+        {
+            system("Color A4");
+            player = 2;
+        }
+
+        cout << playerName[player] << ", enter a alphabet: ";
+        cin >> choice;
+
+        if (player == 1)
+        {
+            move = 'X';
+        }
+        else
+        {
+            move = 'O';
+        }
+
+        if (choice == 'a' && placeHoldersBox[1] == 'a')
+        {
+            placeHoldersBox[1] = move;
+        }
+        else if (choice == 'b' && placeHoldersBox[2] == 'b')
+        {
+            placeHoldersBox[2] = move;
+        }
+        else if (choice == 'c' && placeHoldersBox[3] == 'c')
+        {
+            placeHoldersBox[3] = move;
+        }
+        else if (choice == 'd' && placeHoldersBox[4] == 'd')
+        {
+            placeHoldersBox[4] = move;
+        }
+        else if (choice == 'e' && placeHoldersBox[5] == 'e')
+        {
+            placeHoldersBox[5] = move;
+        }
+        else if (choice == 'f' && placeHoldersBox[6] == 'f')
+        {
+            placeHoldersBox[6] = move;
+        }
+        else if (choice == 'g' && placeHoldersBox[7] == 'g')
+        {
+            placeHoldersBox[7] = move;
+        }
+        else if (choice == 'h' && placeHoldersBox[8] == 'h')
+        {
+            placeHoldersBox[8] = move;
+        }
+        else if (choice == 'i' && placeHoldersBox[9] == 'i')
+        {
+            placeHoldersBox[9] = move;
+        }
+        else
+        {
+            cout << "Invalid move, Please renter: ";
+            player--;
+            cin.ignore();
+            cin.get();
+        }
+        i = checkwin();//returning the value from fuction to check weather the game is still running or not
+        player++;
+    } while (i == -1);
+
+    if (i == 1)
+    {
+        system("Color 3C");
+        cout << "\n\n==>\a" << playerName[--player] << ", WON\n\n";
+    }
+    else
+    {
+        system("Color 6D");
+        cout << "\n\nGAME DRAW ¯(?)¯\n\n";
+    }
+}
+
+class attend
+{
+        float p=0,t=0,w;
+        public:
+                int enter();
+                void calculate();
+};
+int attend::enter()//update the attendance
+{
+        int date,month,year;
+        int i,n,k,a,c;
+        int z[20];
+        cout<<">>ENTER ANY KEY TO GIVE THE DATE... "<<endl;
+        cin>>i;
+        while(i)
+        {
+         cout<<"->Enter DATE/MONTH/YEAR: "<<endl;
+         cin>>date>>month>>year;
+         cout<<endl;
+                if(month== 1||month==3||month==5||month==7||month==8||month==10||month==12)
+                {
+                 if(date>31||date==0)
+                 {
+					c=0;
+				}
+				else
+				{
+					c=1;
+				}
+                }
+                if(month== 4||month==6||month==9||month==11)
+                {
+                 if(date>30 ||date==0)
+                 {
+                 c=0;
+                 }
+                 else
+                 {
+                 c=1;
+                 }
+                }
+                if(month==2)
+                {
+                 if(date>29||date==0)
+                 {
+                 c=0;
+                 }
+                 else
+                 {
+                 c=1;
+                 }
+                }
+                if(month>12)
+                {
+                 c=0;
+                }
+                if(month==0||year==0)
+				{
+					c=0;
+				}
+                switch(c)//gives if the given date is correct or not and update
+                {
+                 case 0:cout<<"Please enter::VALID DATE::"<<endl<<endl;
+                 break;
+               case 1:
+               cout<<">>ENTER NUMBER OF PERIODS IN THE DAY...(max periods=7): ";
+                 cin>>n;
+                 cout<<endl;
+                 for(k=1;k<n+1;k++)
+                 {
+                         cout<<"->ENTER '1' IF PRESENT. PRESS '0' IF ABSENT TO UPDATE THE STATUS OF PERIOD "<<k<<" :";
+                         cin>>a;
+                         if(a==1)
+                         {
+                                 p++;
+                                 t++;
+                                 z[k]=1;
+                                 cout<<"   ......................................................................"<<endl<<endl;
+                                 cout<<"                         :::UPDATED AS PRESENT:::"<<endl<<endl;
+                                 cout<<"   ......................................................................"<<endl<<endl;
+                         }
+                 else
+                         {
+                                 t++;
+                                 z[k]=0;
+                                 cout<<"   ......................................................................"<<endl<<endl;
+                                 cout<<"                          :::UPDATED AS ABSENT:::"<<endl<<endl;
+                                 cout<<"   ......................................................................"<<endl<<endl;
+                         }
+                 }
+                 cout<<endl;
+                 cout<<"                    ::::::ATTENDANCE OF THE DAY IS UPDATED AS:::::"<<endl;
+                 for(k=1;k<n+1;k++)
+                 {
+                 cout<<"__________";
+                 }
+                 cout<<endl<<endl;
+                 cout<<"DD/MM/YY    ";
+                 for(k=1;k<n+1;k++)
+                 {
+                 cout<<"p"<<k<<"    ";
+                 }
+                 cout<<endl<<endl;
+                 cout<<date<<"/"<<month<<"/"<<year<<"   ";
+                 for(k=1;k<n+1;k++)
+                 {
+                 if(z[k]==1)
+                 {
+                 cout<<"P"<<"     ";
+                 }
+                 else
+                 {
+                 cout<<"A"<<"     ";
+                 }
+
+                 }
+                 cout<<endl<<endl;
+                 for(k=1;k<n+1;k++)
+                 {
+                 cout<<"__________";
+                 }
+                 cout<<endl;
+                 cout<<endl;
+                 break;
+				default://To exit
+				exit(0);
+             	}
+                cout<<">>ENTER 1 TO TO UPDATE ANOTHER DAY OR PRESS 0 TO CONTINUE OR PRESS 2 TO EXIT PROGRAM  :";
+                cin>>i;
+                if (i == 2) {
+                	exit(0);
+				}
+                cout<<endl;
+        		}
+ 
+			}
+				void attend::calculate()//calculate the percentage
+			{
+         		int x,r;
+        		float s;
+        		x=(t*75)/100;
+        		s=(p*100)/t;
+        		if(s<75&&s>65)
+        		{
+         		cout<<"   _________________________________________________________________________"<<endl<<endl;
+                cout<<"                           YOUR ATTENDANCE IS LOW : "<<s<<"%"<<endl<<endl;
+                r=x-p;
+                cout<<"   ........................................................................."<<endl<<endl;
+                cout<<"                        you must have attended"<<r<<"classes                "<<endl<<endl;
+                cout<<"   _________________________________________________________________________"<<endl<<endl;
+        		}
+         		if(s<65)
+        		{
+                int y;
+
+                y=(t*65)/100;
+                int  k=y-p;
+                cout<<"   __________________________________________________________________________"<<endl<<endl;
+                cout<<"                     YOUR ATTENDANCE IS : "<<s<<"%"<<endl<<endl;
+                cout<<"   .........................................................................."<<endl<<endl;
+                cout<<"                   you must have attended"<<k<<"classes                      "<<endl;
+                cout<<"   __________________________________________________________________________"<<endl<<endl;
+        		}
+        		if(s>75)
+        		{
+         		cout<<"   __________________________________________________________________________"<<endl<<endl;
+                cout<<"                      YOUR ATTENDANCE IS :"<<s<<"%"<<endl<<endl;
+                cout<<"   .........................................................................."<<endl<<endl;
+            
+                cout<<"   __________________________________________________________________________"<<endl<<endl;
+        		}
+			}
+
+class cafe
+{
+	protected:
+	string ap1="Chicken Wings",ap2="Salads";
+	string m1="Creamy_Tomato_Pasta",m2="Crockpot_Chicken_and_Dumplings";
+	string sw1="Apple_Pie",sw2="Almond_Malai_Kulfi";
+	string d1="Water",d2="Coke",d3="Tea";
+	int pap1=200,pap2=250;
+	int pm1=640,pm2=500;
+	int psw1=150,psw2=100;
+	int pd1=40,pd2=60,pd3=50;	
+	int opt, pay,q;
+	int bil=0;
+	char opt2;
+	
+	
+	public:
+	void menu()	
+	{
+	cout<<endl;
+	cout<<"                          APPETIZERS             "<<endl;
+	cout<<endl;
+	cout<<"    "<<ap1<<"  --------------------   Rs/-"<<pap1<<"  To select press 1"<<endl;	
+	cout<<endl;
+	cout<<"    "<<ap2<<"  --------------------   Rs/-"<<pap2<<"  To select press 2"<<endl;
+	cout<<endl;
+	cout<<"____________________________________________________________________"<<endl;
+	cout<<endl;
+	cout<<"                          MAIN MENU            "<<endl;
+	cout<<endl;
+	cout<<"    "<<m1<<"  --------------------   Rs/-"<<pm1<<"  To select press 3"<<endl;
+	cout<<"Served with some garlic bread and toss a kale salad with lemon dressing."<<endl;	
+	cout<<endl;
+	cout<<"    "<<m2<<"  --------------------   Rs/-"<<pm2<<"  To select press 4"<<endl;
+	cout<<"Garnished with fresh parsley and enjoy with a belly-warming classic bread basket"<<endl;
+	cout<<endl;
+	cout<<"____________________________________________________________________"<<endl;
+	cout<<endl;
+	cout<<"                           DESSERT                   "<<endl;
+	cout<<endl;
+	cout<<"    "<<sw1<<"  --------------------   Rs/-"<<psw1<<"  To select press 5"<<endl;	
+	cout<<endl;
+	cout<<"    "<<sw2<<"  --------------------   Rs/-"<<psw2<<"  To select press 6"<<endl;
+	cout<<endl;
+	cout<<"____________________________________________________________________"<<endl;
+	cout<<endl;
+	cout<<"                            DRINKS             "<<endl;
+	cout<<endl;
+	cout<<"    "<<d1<<"  --------------------   Rs/-"<<pd1<<"  To select press 7"<<endl;	
+	cout<<endl;
+	cout<<"    "<<d2<<"  --------------------   Rs/-"<<pd2<<"  To select press 8"<<endl;
+	cout<<endl;
+	cout<<"    "<<d3<<"  --------------------   Rs/-"<<pd3<<"  To select press 9"<<endl;
+	cout<<endl;
+	cout<<"____________________________________________________________________"<<endl;
+	}
+	public:
+	void order()
+	{
+	cout<<endl;
+	cout<<"Enter the number infront of your selected item "<<endl;
+	cin>>opt;
+	cout<<endl;
+	cout<<"Enter the quantity of your selected item "<<endl;
+	cin>>q;
+	cout<<endl;
+
+	switch(opt)
+	{
+	case 1:
+	cout<<q<<" X "<<ap1<<" is selected"<<endl;	
+	cout<<endl;	
+	bil=bil+(pap1*q);
+	cout<<"Total Bill = "<<bil<<endl;
+	break;	
+	case 2:
+	cout<<q<<" X "<<ap2<<" is selected"<<endl;	
+	cout<<endl;	
+	bil=bil+(pap2*q);
+	cout<<"Total Bill = "<<bil<<endl;
+	break;
+	case 3:
+	cout<<q<<" X "<<m1<<" is selected"<<endl;	
+	cout<<endl;	
+	bil=bil+(pm1*q);
+	cout<<"Total Bill = "<<bil<<endl;
+	break;
+	case 4:
+	cout<<q<<" X "<<m2<<" is selected"<<endl;	
+	cout<<endl;	
+	bil=bil+(pm2*q);
+	cout<<"Total Bill = "<<bil<<endl;
+	break;	
+	case 5:
+	cout<<q<<" X "<<sw1<<" is selected"<<endl;	
+	cout<<endl;	
+	bil=bil+(psw1*q);
+	cout<<"Total Bill = "<<bil<<endl;
+	break;
+	case 6:
+	cout<<q<<" X "<<sw2<<" is selected"<<endl;	
+	cout<<endl;	
+	bil=bil+(psw2*q);
+	cout<<"Total Bill = "<<bil<<endl;
+	break;
+	case 7:
+	cout<<q<<" X "<<d1<<" is selected"<<endl;	
+	cout<<endl;	
+	bil=bil+(pd1*q);
+	cout<<"Total Bill = "<<bil<<endl;
+	break;
+	case 8:
+	cout<<q<<" X "<<d2<<" is selected"<<endl;	
+	cout<<endl;	
+	bil=bil+(pd2*q);
+	cout<<"Total Bill = "<<bil<<endl;
+	break;
+	case 9:
+	cout<<q<<" X "<<d3<<" is selected"<<endl;	
+	cout<<endl;	
+	bil=bil+(pd3*q);
+	cout<<"Total Bill = "<<bil<<endl;
+	break;
+	default:
+	cout<<"wrong entry"<<endl;
+	break;
+	}
+	
+	
+	}
+	
+	void add()
+	{
+	cout<<"                 ADD another Item       "<<endl;
+	menu();
+	order();	
+	}
+	
+	void bill()
+	{
+	cout<<"                           RECEIPT"<<endl;
+	cout<<endl;
+	cout<<"_______________________________________________________________"<<endl;
+	cout<<endl;
+	cout<<"  TOTAL BILL = "<<bil<<endl;
+	cout<<endl;
+	}
+	
+	void payment()
+	{
+		
+	cout<<"If you want to PAY with CARD PRESS \"1\""<<endl;
+	cout<<"If you want to PAY with CASH PRESS \"2\""<<endl;
+	cin>>pay;
+	cout<<endl;
+	switch(pay)
+	{
+	case 1:
+	cout<<"please Swip your card here"<<endl;
+	cout<<"\nPayment in process......"<<endl;
+	cout<<"\nEnjoy your meal :)"<<endl;
+	break;
+	case 2:
+	cout<<"please pay at cash counter...."<<endl;
+	cout<<"\nThank You. Enjoy your meal :)"<<endl;
+	break;
+	default:
+	cout<<"wrong entry"<<endl;
+	break; 	
+	}
+	
+	}
+	
+	void i_am_a_pro()
+	{
+	cout<<"                    WELCOME TO AIR UNI CAFE      "<<endl;	
+	menu();
+	order();
+	do
+	{
+
+	cout<<"If you want to ADD another item PRESS \"a\""<<endl;
+	cout<<"If you want to proceed with billing PRESS \"any other key \""<<endl;
+	cin>>opt2;
+	switch(opt2)
+	{
+	case 'a':
+	add();	
+	break;	
+	}
+	
+    }
+    
+    while (opt2=='a');
+ 
+    bill();
+    payment();
+    
+   }	
+};
+
+class Menu : public TPortal, public GamingZone, public cafe, public attend{
+	private:
+		int option;
+		
+	public:
+		
+		void display(){
+			cout<<"***Welcome to Air University!***"<<endl<<endl;
+			cout<<"Select your desired option: "<<endl;
+			cout<<"1.\tTeacher's Portal"<<endl;
+			cout<<"2. \tGaming Zone"<<endl;
+			cout<<"3.\tUniversity Cafe"<<endl;
+			cout<<"4.\tAttendance Portal"<<endl;
+		}
+		
+		void input(){
+			TPortal T;
+			GamingZone G;
+			cafe C;
+			Menu M;
+			
+			cin>>option;
+			if (option == 1){
+				T.menu(T);
+			}
+			else if (option == 2){
+				G.run();
+			}
+			else if (option == 3){
+				C.i_am_a_pro();
+			}
+			else if (option == 4){
+				attend o1,o2,o3;
+        		int w;
+        		string a;
+        		ifstream file1;
+        		ofstream file2;
+        		cout<<endl;
+        		cout<<"                     STUDENT ATTENDANCE MAINTAINANCE SYSTEM                "<<endl;
+        		cout<<"                   ------------------------------------------              "<<endl<<endl;
+        		cout<<"::::::::::::::::::      PRESS ANY ONE  KEY TO CONTINUE        ::::::::::::::::::"<<endl;
+        		cin>>a;
+        		cout<<endl;
+        		while(a != "")
+        		{
+    			cout<<"********************************   OPTIONS   **********************************"<<endl<<endl;//printing options
+        		cout<<"                            1.VIEW YOUR ATTENDANCE"<<endl<<endl<<"                           2.UPDATE YOUR ATTENDANCE"<<endl<<endl;
+    			cout<<"*******************************************************************************"<<endl;
+    			cin>>w;
+        		switch(w)//perform options
+        		{
+    			case 1:
+        		file1.open("attendance1.csv");
+        		file1.read((char *)& o1, sizeof(o1));
+        		o1.calculate();
+        		file1.close();
+       	 		break;
+        		case 2:
+				file1.open("attendance1.csv");
+				file1.read((char *)& o2, sizeof(o2));
+				file1.close();
+				o2.enter();
+				file2.open("attendance1.csv");
+				file2.write((char *)& o2, sizeof(o2));
+				file2.close();
+				break;
+        		}
+        		cout<<">>ENTER 1 TO CONTINUE. ENTER 2 TO EXIT THE PROGRAM : "<<endl;
+        		cin>>a;
+        		if (a == "2")
+        		exit(0);
+        		}
+			}
+		}
+		
+};
+
+
+int main() {
+
+   Menu M1;
+   
+   M1.display();
+   M1.input();
+    
+    return 0;
+}
